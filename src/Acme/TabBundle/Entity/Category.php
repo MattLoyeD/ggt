@@ -63,7 +63,8 @@ class Category
         return $this->name;
     }
 
-      // public function __construct(){
-        // $this->ca = '';
-    // }
+    public function __construct(){
+        $this->id = 1;
+        $this->name = 'News';
+    }
 }
