@@ -36,7 +36,7 @@
    <img src='{{ v.media.url }}' class='' alt='{{ v.title }}''>
   {% endif %} <br/>  {{ v.description|striptags }}">
 
-  <span class="date">{{ v.date|date("H:i d/m/Y") }}</span>
+  <span class="span2 date pull-right">{{ v.date|date("H:i d/m/Y") }}</span>
   <small class="pull-left span10"><a target="_blank" class="box_link {{ class_highlight }}" href="{{ v.link }}">{{ v.title }}</a></small>
 
 </div><!--/span-->
