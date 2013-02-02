@@ -1,0 +1,76 @@
+    body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+      .sidebar-nav li {margin: 5px;}
+      .resume{border-bottom: 1px solid #cfcfcf ;}
+      /*.resume small{ min-height: 20px !important; }*/
+      .none{display: none;}
+      .link_remover{margin: 3px;}
+      .notification{bottom: 5%;left: 5%;max-width: 150px; position: fixed;}
+      #goup{bottom: 5%;right: 5%; position: fixed;}
+      #form-add-rss {margin: 0 auto;}
+      #form-add-rss button{margin: 3px;}
+      #form-add-rss input{
+        height: 15px;
+      }
+      .box{margin: 10px 5px !important;}
+      .box_link{
+        color: #333;
+      }
+      .date{
+        font-size: 80%;
+        color: #999;
+      }
+      #navbartop{
+        position: fixed;
+        top: 0;
+        width: 100%;
+      }
+      /*.sidebar-nav{border-right: 1px solid #D9FFF7;}*/
+      #tagcloud > a{
+       color: #333;
+       float: left;
+       font-size: 12px !important;
+       width: 95%;
+      }
+      .box .btn{opacity: 0; margin-left: 5px; margin-right: 5%;}
+      .box:hover .btn{opacity: 1;}
+      .top{
+        color: #544E6E;
+      }
+      .box>.top{
+       transform: translate(1px, 250%) rotate(90deg);
+       transform-origin: 0 0 0;
+      }
+      .highlight { background-color: yellow }
+      .h0 { color: #999 }
+      .h1 { color: #111 }
+      .h2 { color: #222 }
+      .h3 { color: #333 }
+      .h4 { color: #444 }
+      .h5 { color: #555 }
+      .h6 { color: #666 }
+      .h7 { color: #777 }
+      .h8 { color: #888 }
+      .h9 { color: #999 }
+
+/*fatuberintro*/
+.introbg{background: url('../img/3.png') repeat center center transparent}
+
+.front-card {
+    height: 328px;
+    top: 20%;
+    width: 50%;
+    max-width: 100%;
+}
+.front-card {
+    margin-left: 20%;
+    position: absolute;
+    width: 50%;
+    max-width: 100%;
+
+}

@@ -1,0 +1,47 @@
+{#foreach($retourParser as $key=&gt;$val)
+{
+  echo $val["title"];
+  echo  $val["description"];
+  echo  $val["pubDate"];
+  echo  $val["link"];
+  foreach($val["category"] as $keysCategory=&gt;$valCategory)
+  {
+    echo $valCategory;
+  }
+ 
+}
+#}
+<ul id="cat_zone" class="nav nav-tabs">
+  
+</ul>
+{% for key,val in parsed %}
+<div class="span6 box" category="{{ val.category.name }}">
+  <div id="{{ val.id }}" class="top"><img src="{{ val.favicon }}" alt="{{ val.name }}"> {{ val.name }}</div> <button class="btn btn-mini seeall">+5</button><button rel="{{ val.id }}" class="btn-mini btn-inverse pull-right btn link_remover">×</button>  
+
+<span class="clearfix"></span>
+  {% for key,v in val.rss %}
+{% set class_highlight %}h0{% endset %}
+{% if hour_ago.1|date("H:i d/m/Y") < v.date|date("H:i d/m/Y") %}{% set class_highlight = "h1" %}{% endif %}
+{% if hour_ago.1|date("H:i d/m/Y") > v.date|date("H:i d/m/Y") %}{% set class_highlight = "h1" %}{% endif %}
+{% if hour_ago.2|date("H:i d/m/Y") > v.date|date("H:i d/m/Y") %}{% set class_highlight = "h2" %}{% endif %}
+{% if hour_ago.3|date("H:i d/m/Y") > v.date|date("H:i d/m/Y") %}{% set class_highlight = "h3" %}{% endif %}
+{% if hour_ago.4|date("H:i d/m/Y") > v.date|date("H:i d/m/Y") %}{% set class_highlight = "h4" %}{% endif %}
+{% if hour_ago.5|date("H:i d/m/Y") > v.date|date("H:i d/m/Y") %}{% set class_highlight = "h5" %}{% endif %}
+{% if hour_ago.6|date("H:i d/m/Y") > v.date|date("H:i d/m/Y") %}{% set class_highlight = "h6" %}{% endif %}
+{% if hour_ago.7|date("H:i d/m/Y") > v.date|date("H:i d/m/Y") %}{% set class_highlight = "h7" %}{% endif %}
+{% if hour_ago.8|date("H:i d/m/Y") > v.date|date("H:i d/m/Y") %}{% set class_highlight = "h8" %}{% endif %}
+{% if hour_ago.9|date("H:i d/m/Y") > v.date|date("H:i d/m/Y") %}{% set class_highlight = "h9" %}{% endif %}
+  {% if key <= 10 %}
+ <div class="resume {% if key >= 4 %}none{% else %}span11{% endif %}" data-title="{{ v.title }}" data-content="{% if v.media is defined %}
+   <img src='{{ v.media.url }}' class='' alt='{{ v.title }}''>
+  {% endif %} <br/>  {{ v.description|striptags }}">
+
+  <span class="date">{{ v.date|date("H:i d/m/Y") }}</span>
+  <small class="pull-left span10"><a target="_blank" class="box_link {{ class_highlight }}" href="{{ v.link }}">{{ v.title }}</a></small>
+
+</div><!--/span-->
+
+{% endif %}
+  {% endfor %}
+</div>
+{% endfor %}

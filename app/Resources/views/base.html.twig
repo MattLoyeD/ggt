@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>GoodGuyTab - One Tab to rule them all</title>
+        {% block stylesheets %}
+        <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+        {% endblock %}
+        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+    </head>
+    <body {% block body_class %}class="introbg"{% endblock %}>
+        {% block body %}
+        <div>
+            {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
+       {#         {{ 'layout.logged_in_as'|trans({'%username%': app.user.username}, 'FOSUserBundle') }} |
+                <a href="{{ path('fos_user_security_logout') }}">
+                    {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}
+                </a>
+                <div class="fos_user_user_show">
+    <p>{{ 'profile.show.username'|trans({}, 'FOSUserBundle') }}: {{ user.username }}</p>
+    <p>{{ 'profile.show.email'|trans({}, 'FOSUserBundle') }}: {{ user.email }}</p>
+</div>#}
+
+            {% else %}
+            <div id="wrap">
+             <div id="page-outer">
+              <div class=" wrapper-front white" id="page-container">
+                <div id="front-container" class="front-container front-container-full-signup">
+                  <noscript>
+                    &lt;div class="front-warning"&gt;
+                      &lt;h3&gt;GoodGuyTab.com fait un usage intensif de JavaScript&lt;/h3&gt;
+                      &lt;p&gt;Si vous ne pouvez pas l'activer dans les préférences de votre navigateur, vous pourriez avoir une meilleure expérience avec notre &lt;a href="http://m.GoodGuyTab.com"&gt;site mobile&lt;/a&gt;.&lt;/p&gt;
+                    &lt;/div&gt;
+                  </noscript>
+
+                  <div class="front-card hero-unit">
+                    <div class="front-welcome">
+                      <div class="front-welcome-text">
+                        <h1>Bienvenue sur GoodGuyTab.</h1>
+                        <p>Découvrez ce qui se passe dans vos médias en temps réel, avec une seule page.</p>
+                        {% block content %}
+                            {% block fos_user_content %}{% endblock %}
+                        {% endblock %}
+                        <p><a href="{{ path('fos_user_security_login') }}">{{ 'layout.login'|trans({}, 'FOSUserBundle') }}</a> | <a href="{{ path('fos_user_registration_register') }}">{{ 'layout.register'|trans({}, 'FOSUserBundle') }}</a></p>
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+        </div>
+
+            </div>
+            {% endif %}
+        </div>{% endblock %}
+        {% block javascripts %}{% endblock %}
+
+
+       
+
+        {% for key, message in app.session.getFlashes() %}
+        <div class="{{ key }}">
+            {{ message|trans({}, 'FOSUserBundle') }}
+        </div>
+        {% endfor %}
+
+
+    </body>
+</html>

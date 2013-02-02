@@ -1,0 +1,107 @@
+{% extends '::base.html.twig' %}
+{% block content %}{% endblock %}
+{% block body %}
+{% if app.user.username is defined %}
+    <div id="navbartop" class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="#">GoodGuyTab</a>
+          <div class="nav-collapse collapse">
+            <p class="navbar-text pull-right">
+              <a href="#" class="navbar-link">{{ app.user.username }}</a> -  <a class="btn btn-mini btn-info" href="{{ path('fos_user_security_logout') }}"><i class="icon-off icon-white"></i></a>
+            </p>
+          <form class="form-inline" id="form-add-rss">
+            <fieldset>
+              <input type="text" value="" name="link_name" class="input-small" placeholder="Name Link" id="link_name">
+              <input type="text" value="" name="link" placeholder="Link" class="input-small" id="link">
+              <input type="text" value="" name="add_category" placeholder="Category" class="input-small" id="add_category">
+              <button class="btn btn-mini btn-success" id="link_submit">Ok, add this one!</button>
+              <button class="btn btn-mini btn-inverse refresher_orb"><i class="icon-refresh icon-white"></i> Refresh</button>
+            </fieldset>
+          </form>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span2">
+          <div id="sidebar pull-left" class="sidebar-nav">
+                <div class="btn-toolbar">
+                  <div class="btn-group btn-group-vertical listing">
+                    <!--Fastlinks here-->
+                  </div>
+                </div>
+            <div id="tags">
+              <h5>Trends</h5>
+              <p class="clearfix"></p>
+              <div id="tagcloud">
+              <!--Most used keywords-->
+              </div>
+            </div>
+          </div><!--/.well -->
+        </div><!--/span-->
+        <div class="span10">
+          <div id="here" class="row-fluid">
+            <!--RSS here-->
+          </div><!--/row-->
+        </div><!--/span-->
+      </div><!--/row-->
+
+      <hr>
+
+      <footer>
+        <p>&copy; <a href="http://twitter.com/Mooty_d">Mooty</a> 2012-2013 - Project is on my <a href="https://github.com/Mooty13/GoodGuyTab">GitHub</a> repo, i'm open to any suggestion and work ! - "Ain't nobody got time for that." (&copy;)</p>
+      </footer>
+
+      <p class="notification alert alert-info none"></p>
+      <button id="goup" class="btn btn-inverse btn-large"><i class="icon-white icon-arrow-up"></i></button>
+
+       </div><!--/.fluid-container-->
+{% block javascript %}
+<script type="text/javascript">var apilink = '{{ path('api') }}';</script>
+<script type="text/javascript" src="{{ asset('js/jquery-1.8.3.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/bootstrap.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/jquery.dynacloud.min.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/jquery.ggt.js') }}"></script>
+<script type="text/javascript"> $('body').removeClass('introbg');</script>
+{% endblock %}
+{% else %}
+ <div id="wrap">
+             <div id="page-outer">
+              <div class=" wrapper-front white" id="page-container">
+                <div id="front-container" class="front-container front-container-full-signup">
+                  <noscript>
+                    &lt;div class="front-warning"&gt;
+                      &lt;h3&gt;GoodGuyTab.com fait un usage intensif de JavaScript&lt;/h3&gt;
+                      &lt;p&gt;Si vous ne pouvez pas l'activer dans les préférences de votre navigateur, vous pourriez avoir une meilleure expérience avec notre &lt;a href="http://m.GoodGuyTab.com"&gt;site mobile&lt;/a&gt;.&lt;/p&gt;
+                    &lt;/div&gt;
+                  </noscript>
+
+
+                  <div class="front-card hero-unit">
+                    <div class="front-welcome">
+                      <div class="front-welcome-text">
+                        <h1>Bienvenue sur GoodGuyTab.</h1>
+                        <p>Découvrez ce qui se passe dans vos médias en temps réel, avec une seule page.</p>
+                        <p><a href="{{ path('fos_user_security_login') }}">{{ 'layout.login'|trans({}, 'FOSUserBundle') }}</a> | <a href="{{ path('fos_user_registration_register') }}">{{ 'layout.register'|trans({}, 'FOSUserBundle') }}</a></p>
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+        </div>
+
+            </div>
+{% endif %}
+{% endblock %}
