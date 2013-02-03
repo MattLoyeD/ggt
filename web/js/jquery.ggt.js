@@ -1,7 +1,7 @@
 $.merge($.dynaCloud.stopwords, ["direct","link","football","sport","tennis","basket","rugby","news","league","ligue","mais","ou","et","donc","or","ni","car","en","ce","ca","cette","cet","ces","se","ses"]);
 
   $(document).ready(function() {
-     $('body').removeClass('introbg');
+    
      // $('.sidebar-nav').affix();
     function scrollToDiv(element,navheight){
       var offset = element.offset();
