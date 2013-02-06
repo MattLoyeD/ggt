@@ -1,3 +1,4 @@
+$('body').removeClass('introbg');
 $.merge($.dynaCloud.stopwords, ["direct","link","football","sport","tennis","basket","rugby","news","league","ligue","mais","ou","et","donc","or","ni","car","en","ce","ca","cette","cet","ces","se","ses"]);
 
   $(document).ready(function() {
@@ -141,5 +142,8 @@ $.merge($.dynaCloud.stopwords, ["direct","link","football","sport","tennis","bas
       });
 
     });
-
+    
+if (flash) {
+  $('#link_name').tooltip({ title : message, placement : 'bottom' }).tooltip('show');
+}
    });

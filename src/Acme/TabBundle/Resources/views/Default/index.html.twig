@@ -39,7 +39,7 @@
                   </div>
                 </div>
             <div id="tags">
-              <h5>Trends</h5>
+              <h5>{{ 'trends'|trans }}</h5>
               <div id="tagcloud" class="clearfix">
               <!--Most used keywords-->
               </div>
@@ -64,12 +64,11 @@
 
        </div><!--/.fluid-container-->
 {% block javascript %}
-<script type="text/javascript">var apilink = '{{ path('api') }}';</script>
+<script type="text/javascript">var apilink = '{{ path('api') }}';{% if flash is defined %}var flash = '{{ flash }}';var message = "{{ 'first_login'|trans }}";{% endif %}</script>
 <script type="text/javascript" src="{{ asset('js/jquery-1.8.3.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/bootstrap.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/jquery.dynacloud.min.js') }}"></script>
 <script type="text/javascript" src="{{ asset('js/jquery.ggt.js') }}"></script>
-<script type="text/javascript"> $('body').removeClass('introbg');</script>
 {% endblock %}
 {% else %}
  <div id="wrap">

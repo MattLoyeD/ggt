@@ -21,16 +21,31 @@ class DefaultController extends Controller
      */
     public function indexAction()
     {
+
         $user = $this->container->get('security.context')->getToken()->getUser();
         $em = $this->getDoctrine()->getEntityManager();
-        // $cats = $em->getRepository('AcmeTabBundle:Category')->findAll();
 
         return $this->render('AcmeTabBundle:Default:index.html.twig',array(
         	'user' => $user,
-        	// 'cats' => $cats
         	)
         );
     } 
+
+    /**
+     * @Route("/help", name="index_first_connexion")
+     * @Template()
+     */
+    public function indexNewUserAction()
+    {
+        $user = $this->container->get('security.context')->getToken()->getUser();
+        $em = $this->getDoctrine()->getEntityManager();
+        return $this->render('AcmeTabBundle:Default:index.html.twig',array(
+        	'user' => $user,
+        	'flash' => 'first_connexion',
+        	)
+        );
+    } 
+
 
 	/**
      * Récupère le nom de domaine raccourci à partir d'une url

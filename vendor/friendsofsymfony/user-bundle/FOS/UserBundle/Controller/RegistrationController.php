@@ -111,10 +111,15 @@ class RegistrationController extends ContainerAware
         if (!is_object($user) || !$user instanceof UserInterface) {
             throw new AccessDeniedException('This user does not have access to this section.');
         }
+    
+         $response = new RedirectResponse($this->container->get('router')->generate('index_first_connexion'));
 
-        return $this->container->get('templating')->renderResponse('FOSUserBundle:Registration:confirmed.html.'.$this->getEngine(), array(
+        return $response;
+
+    /*return new RedirectResponse($this->generateUrl('index'));
+     return $this->container->get('templating')->renderResponse('FOSUserBundle:Registration:confirmed.html.'.$this->getEngine(), array(
             'user' => $user,
-        ));
+        ));*/
     }
 
     /**
