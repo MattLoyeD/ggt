@@ -1,5 +1,5 @@
 $('body').removeClass('introbg');
-$.merge($.dynaCloud.stopwords, ["direct","link","football","sport","tennis","basket","rugby","news","league","ligue","mais","ou","et","donc","or","ni","car","en","ce","ca","cette","cet","ces","se","ses"]);
+$.merge($.dynaCloud.stopwords, ["I","VII","VI","V","II","III","IV","IX","X","direct","link","foot","match","football","sport","tennis","basket","rugby","news","league","ligue","mais","ou","et","donc","or","ni","car","en","ce","ca","cette","cet","ces","se","ses"]);
 
   $(document).ready(function() {
     
@@ -13,9 +13,7 @@ $.merge($.dynaCloud.stopwords, ["direct","link","football","sport","tennis","bas
      }
 
     function notification(t){
-
-      $('.notification').text(t).fadeIn('fast').delay(2000).fadeOut('fast');
-
+      $('.notification').html(t).fadeIn('fast').delay(2000).fadeOut('fast');
     }
 
     function showCategory(n){
@@ -27,38 +25,71 @@ $.merge($.dynaCloud.stopwords, ["direct","link","football","sport","tennis","bas
 
     function rssReloader(){
 
-    $('#here').fadeToggle('fast').load(apilink+"?module=getAllRss",function(){
-         
-           $('.listing .btn').remove();
-           $('#cat_zone li').remove();
+      $.ajax({
+        type : 'GET', 
+        url : apilink , 
+        data : 'module=getAllRss',
+      
+      beforeSend : function() {
+        $('#here,#tags').fadeOut('fast');
+        $('.refresher_orb').addClass('disabled');
+        $('#loading').fadeIn('fast');
+      },
+      
+      error : function(){
+        $('#tags,#here').fadeIn('fast');
+        notification('<strong>Connexion problem / Try hit refresh button of check your internet connexion.</strong>');
+      },
+
+      success : function(data){ 
+
+        /*$('.listing .btn').remove();*/
+        //$('#cat_zone li').remove();
+
+        $('#tagcloud').html('');
+
+        $.dynaCloud.max = 5;
+
+        $('#here').html(data);
+        $('.resume  ').dynaCloud('#tagcloud');    
+      
+
+       /* $('#here .top').each(function(){
           
-            $('#here .top').each(function(){
-         
-              $(this).clone().appendTo('.listing').wrap('<div class="btn btn-small" />');
-         
-            }); 
-         
-          $('.box').each(function(){
-            $cat = $(this).attr('category');
-            
-            if(!$('#cat_zone li').hasClass($cat.toLowerCase()))
-               $('#cat_zone').append('<li class='+$cat.toLowerCase()+'><a href="#">'+$cat+'</a></li>');
+          $(this).clone().appendTo('.listing').wrap('<div class="btn btn-small" />');
+    
+        }); */
+    
+        $('.refresher_orb').removeClass('disabled');
 
-          });
-
-          //Selection des bons flux et bouton a gauche selon la catégorie
-          showCategory($('#cat_zone li:first-child a').text());
-
-
-          $('.resume').popover({placement: 'bottom', trigger: 'hover', html: true});
+    
+        $('.box').each(function(){
+        
+          $cat = $(this).attr('category');
           
-          $('#tagcloud').html('');
-           $.dynaCloud.max = 5;
-          $('#here').dynaCloud('#tagcloud');    
+          if(!$('#cat_zone li').hasClass($cat.toLowerCase()))
+             $('#cat_zone').append('<li class='+$cat.toLowerCase()+'><a href="#">'+$cat+'</a></li>');
 
-          }).fadeToggle('fast');
+        });
 
-          }
+        $('.resume').popover({placement: 'bottom', trigger: 'hover', html: true});
+        $('#loading').fadeOut('fast');
+        $('#tags,#here').fadeIn('fast');
+
+        $('#here').ready(function(){
+        
+        if($('#cat_zone li.active').length == 0){
+          console.log($('#cat_zone li.active').length);
+          showCategory($('#cat_zone li:first-child a').text());  
+        }else{
+          showCategory($('#cat_zone li.active').text());
+        }
+
+        });
+
+        }});
+        
+         }
 
     rssReloader();
 
@@ -78,8 +109,8 @@ $.merge($.dynaCloud.stopwords, ["direct","link","football","sport","tennis","bas
 
     $('.seeall').live("click",function(){
 
-      $(this).nextAll('.none').toggleClass('span11');
-
+      /*$(this).prev('.box').children('.none').toggleClass('span11');*/
+      $(this).closest('.box').children('.none').toggleClass('span11');
     });
 
     $('.listing .top').live("click",function(){
@@ -117,7 +148,7 @@ $.merge($.dynaCloud.stopwords, ["direct","link","football","sport","tennis","bas
             rssReloader();
           }
 
-        if(data.status == 'Error')
+        if(data.status == 'Error' || data.status == 'KO')
           notification(data.error);
 			});
 
@@ -127,14 +158,14 @@ $.merge($.dynaCloud.stopwords, ["direct","link","football","sport","tennis","bas
 
     $('.link_remover').live("click",function(){
      
-    $.getJSON(apilink, {
+   $.getJSON(apilink, {
         module: 'deleteLink',
         id:  $(this).attr('rel')
       }, function(data) {
 
         if(data.status !== 'KO'){
         
-            notification($(this).closest('span').text()+' retiré');
+            notification($(this).closest('.box').find('.top').html()+' retiré');
 
             rssReloader();
 
@@ -143,7 +174,7 @@ $.merge($.dynaCloud.stopwords, ["direct","link","football","sport","tennis","bas
 
     });
     
-if (flash) {
+if (typeof flash != 'undefined') {
   $('#link_name').tooltip({ title : message, placement : 'bottom' }).tooltip('show');
 }
    });

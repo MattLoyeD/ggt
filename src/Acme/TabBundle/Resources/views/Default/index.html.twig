@@ -20,7 +20,7 @@
               <input type="text" value="" name="link_name" class="input-small" placeholder="Name Link" id="link_name">
               <input type="text" value="" name="link" placeholder="Link" class="input-small" id="link">
               <input type="text" value="" name="add_category" placeholder="Category" class="input-small" id="add_category">
-              <button class="btn btn-mini btn-success" id="link_submit">Ok, add this one!</button>
+              <button class="btn btn-mini btn-success" id="link_submit">{{ 'ok_add_this'|trans }}</button>
               <button class="btn btn-mini btn-inverse refresher_orb"><i class="icon-refresh icon-white"></i> Refresh</button>
             </fieldset>
           </form>
@@ -47,6 +47,7 @@
           </div><!--/.well -->
         </div><!--/span-->
         <div class="span10">
+          <div id="loading"><img src="{{ asset('img/loading.gif') }}" alt="w8 for Load !"></div>
           <div id="here" class="row-fluid">
             <!--RSS here-->
           </div><!--/row-->
@@ -56,7 +57,7 @@
       <hr>
 
       <footer>
-        <p>&copy; <a href="http://twitter.com/Mooty_d">Mooty</a> 2012-2013 - Project is on my <a href="https://github.com/Mooty13/ggt">GitHub</a> repo, i'm open to any suggestion and work ! - "Ain't nobody got time for that." (&copy;)</p>
+        <p>&copy; <a href="http://twitter.com/Mooty_d">Mooty</a> 2012-2013 - Project is on my <a href="https://github.com/Mooty13/ggt">GitHub</a> repo, i'm open to any suggestion and work ! - "Ain't nobody got time fo Dat." (&copy;)</p>
       </footer>
 
       <p class="notification alert alert-info none"></p>

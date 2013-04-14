@@ -35,7 +35,7 @@ body {
 }
 
 .date{
-  font-size: 80%;
+  font-size: 60%;
   color: #999;
 }
 
@@ -85,6 +85,7 @@ body {
 .h7 { color: #777 }
 .h8 { color: #888 }
 .h9 { color: #999 }
+.h10 { color: #000033 }
 
 #cat_zone {
   margin-bottom: 3px;
@@ -100,3 +101,5 @@ body {
     margin: 5%;
     position: absolute;
 }
+
+#loading{display: none;}

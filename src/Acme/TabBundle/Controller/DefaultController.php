@@ -56,6 +56,7 @@ class DefaultController extends Controller
     public static function get_domain($url) {
     
     	$nowww = preg_replace('/www./i','',$url);
+    	$nowww = preg_replace('/rss./i','',$nowww);
     	$domain = parse_url($nowww);
     
     	if(!empty($domain["host"]))
@@ -77,9 +78,9 @@ class DefaultController extends Controller
 			                                  	  'error' => 'Disconnected')));
 			
 		$request = $this->getRequest();
-		
+/*		
 		if (!$request->isXmlHttpRequest())
-			return new Response('666 The number of the beast.');
+			return new Response('666 The number of the beast.');*/
 		
 		$em = $this->getDoctrine()->getEntityManager();
 		
@@ -131,21 +132,79 @@ class DefaultController extends Controller
 					
 				return new Response(json_encode(Array('status'=> 'OK')));
 
+				case 'getRssTitle':
 
+				$url = $request->query->get('url');
+				$string = file_get_contents($url);
+				if ('UTF-8' != mb_detect_encoding($string)) {
+				    $string = mb_convert_encoding($string, 'HTML-ENTITIES', "UTF-8");
+				}
+			    $dom = new \DOMDocument();
+			    // hack to preserve UTF-8 characters
+			    $dom->preserveWhiteSpace = false;
+			    $dom->encoding = 'UTF-8';
+				$dom->loadXml($string);
+
+				$xpath = new \DOMXPath($dom); 
+
+				$query = '//channel/title'; 
+				$query = $xpath->query($query); 
+				// find first item 
+				$title_xml = $query->item(0)->nodeValue; 
+
+				return new Response($title_xml);
 
 				case 'getRss':
 
 				$linksend = $request->query->get('link');
-				$parseur = new ParseurRSS();
-				$parsed = $parseur->parser($linksend, "RSS");
+				$stringurl = $em->getRepository('AcmeTabBundle:Link')->findById($linksend);
+				//var_dump($stringurl);
+				$string = file_get_contents($stringurl[0]->getLink());
 
+				if ('UTF-8' != mb_detect_encoding($string)) {
+				    $string = mb_convert_encoding($string, 'HTML-ENTITIES', "UTF-8");
+				}
+			    $dom = new \DOMDocument();
+			    // hack to preserve UTF-8 characters
+			    $dom->preserveWhiteSpace = false;
+			    $dom->encoding = 'UTF-8';
+				$dom->loadXml($string);
+
+				$xpath = new \DOMXPath($dom); 
+
+				$query = '//channel/title'; 
+				$query = $xpath->query($query); 
+				// find first item 
+				$title_xml = $query->item(0)->nodeValue; 
+
+				$query1 = '//channel/item/title';
+				$query2 = '//channel/item/link';
+				$query3 = '//channel/item/pubDate';
+				$query4 = '//channel/item/description';
+				$query1 = $xpath->query($query1);
+				$query2 = $xpath->query($query2);
+				$query3 = $xpath->query($query3);
+				$query4 = $xpath->query($query4);
+				$title1 = $query1->item(0)->nodeValue;
+				for ($i = 0; $i < 10; $i++) {
+					$content[] = array(
+						'title' => $query1->item($i)->nodeValue , 
+						'link' => $query2->item($i)->nodeValue , 
+						'pubDate' => $query3->item($i)->nodeValue , 
+						'description' => $query4->item($i)->nodeValue 
+						);
+				}
+
+			    return new Response(json_encode(array('titleRSS' => $title_xml, 'content' => $content,'title1'=>$title1)));
 
 
 				case 'getAllRss':
 
+
+				date_default_timezone_set('Europe/Paris');
 				$parsed = array();
 				$hour_ago = array();
-				for ($i=0; $i < 10; $i++) { 
+				for ($i=0; $i < 11; $i++) { 
 					$hour_ago[$i] = strtotime('-'.$i.' hour');
 				}
 
@@ -156,14 +215,15 @@ class DefaultController extends Controller
 
 					if($rss = @file_get_contents($f->getLink())){
 
+					// $rss = tidy_repair_string($rss,array('input-xml' => 1));
 					// $cat = $em->getRepository('AcmeTabBundle:Category')->findOneById($f->getCategory());
 
-					$parseur = new RssController($rss);
+					if($parseur = new RssController($rss)){
 					$favicon = 'http://www.google.com/s2/favicons?domain='.$this->get_domain($f->getLink());
 				
-					$parsed[]=array('id' => $f->getId(), 'category' => $f->getCategory(), 'name' => $f->getName(), 'link'=> $f->getLink(), 'rss' => $parseur->exportItems(),'favicon'=>$favicon);
+					$parsed[]=array('id' => $f->getId(), 'category' => $f->getCategory(), 'name' => $f->getName(), 'link'=> @$f->getLink(), 'rss' => $parseur->exportItems(),'favicon'=>$favicon);
 				
-					}}
+					}}}
 				}
 
 				return $this->render('AcmeTabBundle:Default:loop.html.twig',array(
