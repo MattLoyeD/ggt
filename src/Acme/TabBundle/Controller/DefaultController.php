@@ -157,45 +157,65 @@ class DefaultController extends Controller
 				case 'getRss':
 
 				$linksend = $request->query->get('link');
-				$stringurl = $em->getRepository('AcmeTabBundle:Link')->findById($linksend);
+				$stringurl = $em->getRepository('AcmeTabBundle:Link')->findOneById($linksend);
 				//var_dump($stringurl);
-				$string = file_get_contents($stringurl[0]->getLink());
+
+				$string = file_get_contents($stringurl->getLink());
 
 				if ('UTF-8' != mb_detect_encoding($string)) {
 				    $string = mb_convert_encoding($string, 'HTML-ENTITIES', "UTF-8");
 				}
-			    $dom = new \DOMDocument();
+				$array = new NewRssController;
+				$a2 = $array->createArray($string);
+				echo "<pre>";
+				var_dump($a2);
+				echo "</pre>";
+				  /*  $dom = new \DOMDocument();
 			    // hack to preserve UTF-8 characters
 			    $dom->preserveWhiteSpace = false;
 			    $dom->encoding = 'UTF-8';
 				$dom->loadXml($string);
 
-				$xpath = new \DOMXPath($dom); 
+				$xpath = new \DOMXPath($dom); */
 
-				$query = '//channel/title'; 
-				$query = $xpath->query($query); 
+
+				//$query = '//channel/title'; 
+				//$query = $xpath->query($query); 
 				// find first item 
-				$title_xml = $query->item(0)->nodeValue; 
+				//$title_xml = $query->item(0)->nodeValue; 
 
-				$query1 = '//channel/item/title';
+				/*$query1 = '//channel/item/title';
 				$query2 = '//channel/item/link';
 				$query3 = '//channel/item/pubDate';
 				$query4 = '//channel/item/description';
-				$query1 = $xpath->query($query1);
-				$query2 = $xpath->query($query2);
-				$query3 = $xpath->query($query3);
-				$query4 = $xpath->query($query4);
-				$title1 = $query1->item(0)->nodeValue;
+				$q1 = $xpath->query($query1);
+				echo $q1->nodeValue;
+				$q2 = $xpath->query($query2);
+				$q3 = $xpath->query($query3);
+				$q4 = $xpath->query($query4);
 				for ($i = 0; $i < 10; $i++) {
 					$content[] = array(
-						'title' => $query1->item($i)->nodeValue , 
-						'link' => $query2->item($i)->nodeValue , 
-						'pubDate' => $query3->item($i)->nodeValue , 
-						'description' => $query4->item($i)->nodeValue 
+						'title' => $query1->nodeValue , 
+						'link' => $query2->nodeValue , 
+						'pubDate' => $query3->nodeValue , 
+						'description' => $query4->nodeValue 
 						);
-				}
+				}*/
+				/*$elements = $xpath->query("//channel/item");
+				foreach ($elements as $element) {
+				    $nodes = $element->childNodes;
 
-			    return new Response(json_encode(array('titleRSS' => $title_xml, 'content' => $content,'title1'=>$title1)));
+				    	# code...
+					foreach ($nodes as $node) {
+				    	for ($i=0; $i < count($nodes) ; $i++) { 
+					    	  $content[$element->nodeName][$i][$node->nodeName] = $node->nodeValue;
+					    	}
+				    	}
+				  }
+				  echo "<pre>";
+				  var_dump($content);
+				  echo "</pre>";*/
+			    return new Response(json_encode(array('content' => 'ok')));
 
 
 				case 'getAllRss':
