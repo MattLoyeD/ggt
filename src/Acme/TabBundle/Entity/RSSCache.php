@@ -22,11 +22,25 @@ class RSSCache
     private $id;
 
     /**
+     * 
+     * @ORM\ManyToOne(targetEntity="Acme\TabBundle\Entity\Link", inversedBy="id")
+     */
+    private $id_rss;
+
+
+    /**
      * @var string
      *
      * @ORM\Column(name="title", type="string", length=255)
      */
     private $title;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="url", type="string", length=500)
+     */
+    private $url;
 
     /**
      * @var string
@@ -112,6 +126,52 @@ class RSSCache
     {
         return $this->content;
     }
+    
+    /**
+     * Set RSS Parent ID
+     *
+     * @param string $id_rss
+     * @return RSSCache
+     */
+    public function setIdRss($id_rss)
+    {
+        $this->id_rss = $id_rss;
+    
+        return $this;
+    }
+
+    /**
+     * Get RSS Parent ID
+     *
+     * @return string 
+     */
+    public function getIdRss()
+    {
+        return $this->id_rss;
+    }
+
+    /**
+     * Set url
+     *
+     * @param string $url
+     * @return RSSCache
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
+    
+        return $this;
+    }
+
+    /**
+     * Get url
+     *
+     * @return string 
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
 
     /**
      * Set date
@@ -181,4 +241,16 @@ class RSSCache
     {
         return $this->last_update;
     }
+
+
+    public function __construct(){
+        $this->id_rss = '';
+        $this->title = '';
+        $this->image = '';
+        $this->url = '';
+        $this->content = '';
+        $this->date = '';
+        $this->last_update = new \DateTime('now');
+    }
+
 }

@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Acme\UserBundle\Enity\User;
 use Acme\TabBundle\Entity\Link;
 use Acme\TabBundle\Entity\Category;
+use Acme\TabBundle\Entity\RSSCache;
 // use Acme\TabBundle\Controller\ParseurRSS;
 
 class DefaultController extends Controller
@@ -157,65 +158,65 @@ class DefaultController extends Controller
 				case 'getRss':
 
 				$linksend = $request->query->get('link');
-				$stringurl = $em->getRepository('AcmeTabBundle:Link')->findOneById($linksend);
-				//var_dump($stringurl);
+				
+				// Preserve useless things
+				if(empty($linksend))
+					return new Response(json_encode(array("error"=>"Nothing to analyse")));
 
-				$string = file_get_contents($stringurl->getLink());
+				if(!$stringurl = $em->getRepository('AcmeTabBundle:Link')->findOneById($linksend))
+					return new Response(json_encode(array("error"=>"Does not exist")));
+				
+				$rssCached = $stringurl = $em->getRepository('AcmeTabBundle:RSSCache')->findOneByIdRss($linksend);
 
+				if($rssCache->getLastUpdate() < strtotime("now - 5 minutes"))
+					return new Response(json_encode(array('content' => $rssCache)));
+
+
+				if(!$string = file_get_contents($stringurl->getLink()))
+					return new Response(json_encode(array("error"=>'URL Unreachable')));
+
+
+				// Hack for fucking encoding problems
 				if ('UTF-8' != mb_detect_encoding($string)) {
 				    $string = mb_convert_encoding($string, 'HTML-ENTITIES', "UTF-8");
 				}
+			
+				// Let's go to the mallllll today
 				$array = new NewRssController;
 				$a2 = $array->createArray($string);
+			
+				/* Tricherie V2
 				echo "<pre>";
 				var_dump($a2);
 				echo "</pre>";
-				  /*  $dom = new \DOMDocument();
-			    // hack to preserve UTF-8 characters
-			    $dom->preserveWhiteSpace = false;
-			    $dom->encoding = 'UTF-8';
-				$dom->loadXml($string);
-
-				$xpath = new \DOMXPath($dom); */
+				*/
 
 
-				//$query = '//channel/title'; 
-				//$query = $xpath->query($query); 
-				// find first item 
-				//$title_xml = $query->item(0)->nodeValue; 
+				for ($i=0; $i < count($a2['rss']['channel']['item']) ; $i++) { 
+				
+					$rssCache[$i] = new RSSCache;
+					
+					$rssCache->setIdRss($linksend);
 
-				/*$query1 = '//channel/item/title';
-				$query2 = '//channel/item/link';
-				$query3 = '//channel/item/pubDate';
-				$query4 = '//channel/item/description';
-				$q1 = $xpath->query($query1);
-				echo $q1->nodeValue;
-				$q2 = $xpath->query($query2);
-				$q3 = $xpath->query($query3);
-				$q4 = $xpath->query($query4);
-				for ($i = 0; $i < 10; $i++) {
-					$content[] = array(
-						'title' => $query1->nodeValue , 
-						'link' => $query2->nodeValue , 
-						'pubDate' => $query3->nodeValue , 
-						'description' => $query4->nodeValue 
-						);
-				}*/
-				/*$elements = $xpath->query("//channel/item");
-				foreach ($elements as $element) {
-				    $nodes = $element->childNodes;
+					$rssCache->setTitle($a2['rss']['channel']['item'][$i]['title']);
+					$rssCache->setContent(substr(htmlentities($a2['rss']['channel']['item'][$i]['description']),0,1000));
+					$rssCache->setUrl($a2['rss']['channel']['item'][$i]['url']);
+					
+					// Care w/ images bitch
+					//$rssCache->setImage($a2['rss']['channel']['item'][$i]['image_src']);
+					
+					$rssCache->setDate($a2['rss']['channel']['item'][$i]['date']);
+			
+				}
 
-				    	# code...
-					foreach ($nodes as $node) {
-				    	for ($i=0; $i < count($nodes) ; $i++) { 
-					    	  $content[$element->nodeName][$i][$node->nodeName] = $node->nodeValue;
-					    	}
-				    	}
-				  }
-				  echo "<pre>";
-				  var_dump($content);
-				  echo "</pre>";*/
-			    return new Response(json_encode(array('content' => 'ok')));
+				$em->persist($rssCache);
+				$em->flush();
+				
+				// New ones inc. Reloading everything. No pity for databases
+				unset($rssCached);
+				$rssCached = $stringurl = $em->getRepository('AcmeTabBundle:RSSCache')->findOneByIdRss($linksend);
+
+			    return new Response(json_encode(array('content' => $rssCached)));
 
 
 				case 'getAllRss':
