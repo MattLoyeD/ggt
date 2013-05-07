@@ -1,0 +1,44 @@
+{# % if from_cache == true %}
+<p>True</p>
+{% endif %}
+
+{% for v in content %}
+<p>
+	{{ v.title }} <br>
+	{{ v.url }} <br>
+	{{ v.content }} <br>
+	{{ v.image }} <br>
+</p>
+{% endfor % #}
+
+{% if v is defined %}
+ {% set xml = v %}
+{% endif %}
+
+{% for key,v in xml %}
+ 	{% set class_highlight %}h0{% endset %}
+
+	{% for i in 0..10 %}
+    	{% set hour = hour_ago[i] %}{% set i2 = i + 1 %}{% set class = 'h'~i2 %}
+    	{% if hour|date("H:i d/m/Y") > v.date|date("H:i d/m/Y") %}
+      		{% set class_highlight = class %}
+    	{% endif %}
+	{% endfor %}
+
+	{% if key <= 10 %}
+	 <div class="resume {% if key >= 5 %}none{% else %}span11{% endif %}" class='' alt='{{ v.title }}'>
+
+		<div class="desc">
+		{% if v.image is not empty %}
+	   		<img src='{{ v.image }}' class='pull-left span3' alt='{{ v.title }}'>
+	  	{% endif %}
+	  	<span class="span8 pull-left">{{ v.content }}</span>
+		</div>
+
+	  <span class=" date pull-right">{{ v.date|date("H:i d/m") }}</span>
+	  <small class="pull-left span10"><a target="_blank" class="box_link {{ class_highlight }}" href="{{ v.url }}">{{ v.title }}</a></small>
+
+	</div><!--/span-->
+
+	{% endif %}
+{% endfor %}

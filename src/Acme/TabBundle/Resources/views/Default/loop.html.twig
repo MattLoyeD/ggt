@@ -14,47 +14,27 @@
 <ul id="cat_zone" class="nav nav-tabs">
   
 </ul>
-{% for key,val in parsed %}
-<div class="span6 box" category="{{ val.category.name }}">
-  <div id="{{ val.id }}" class="top"><img src="{{ val.favicon }}" alt="{{ val.name }}"> {{ val.name }}</div>   
+{% for val in parsed %}
+  <div class="span6 box" category="{{ val.category.name }}">
+      <div id="{{ val.id }}" class="top"><img src="{{ val.favicon }}" alt="{{ val.name }}"> {{ val.name }}</div>   
 
-<div class="btn-group pull-right">
-  <button class="btn btn-mini"><i class="icon-adjust"></i></button>
-  <button class="btn btn-mini dropdown-toggle" data-toggle="dropdown">
-    <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu">
-   <li><a href="#" class="seeall"><i class="icon-plus"></i> See all entries</a></li>
-   <li><a href="{{ val.link }}" target="_blank" class="seeall"><i class="icon-map-marker"></i> See original RSS</a></li>
-   <li class="divider"></li>
-   <li><a href="#" rel="{{ val.id }}" class="change_category"><i class="icon-folder-open"></i> Change category</a></li>
-   <li><a href="#" rel="{{ val.id }}" class="link_remover"><i class="icon-trash"></i> Remove this feed</a></li>
-  </ul>
-</div>
+      <div class="btn-group pull-right">
+        <button class="btn btn-mini"><i class="icon-adjust"></i></button>
+        <button class="btn btn-mini dropdown-toggle" data-toggle="dropdown">
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+         <li><a href="#" class="seeall"><i class="icon-plus"></i> See all entries</a></li>
+         <li><a href="{{ val.link }}" target="_blank" class="seeall"><i class="icon-map-marker"></i> See original RSS</a></li>
+         <li class="divider"></li>
+         <li><a href="#" rel="{{ val.id }}" class="change_category"><i class="icon-folder-open"></i> Change category</a></li>
+         <li><a href="#" rel="{{ val.id }}" class="link_remover"><i class="icon-trash"></i> Remove this feed</a></li>
+        </ul>
+      </div>
 
-<span class="clearfix"></span>
-  {% for key,v in val.rss %}
-
-  {% set class_highlight %}h0{% endset %}
-
-  {% for i in 0..10 %}
-    {% set hour = hour_ago[i] %}{% set i2 = i + 1 %}{% set class = 'h'~i2 %}
-    {% if hour|date("H:i d/m/Y") > v.date|date("H:i d/m/Y") %}
-      {% set class_highlight = class %}
-    {% endif %}
-  {% endfor %}
-
-  {% if key <= 10 %}
- <div class="resume {% if key >= 5 %}none{% else %}span11{% endif %}" data-title="{{ v.title }}" data-content="{% if v.media is defined %}
-   <img src='{{ v.media.url }}' class='' alt='{{ v.title }}''>
-  {% endif %} <br/>  {{ v.description|striptags }}">
-
-  <span class="span2 date pull-right">{{ v.date|date("H:i d/m") }}</span>
-  <small class="pull-left span10"><a target="_blank" class="box_link {{ class_highlight }}" href="{{ v.link }}">{{ v.title }}</a></small>
-
-</div><!--/span-->
-
-{% endif %}
-  {% endfor %}
-</div>
+      <span class="clearfix"></span>
+      {% for xml in val.rss %}
+        {% include 'AcmeTabBundle:Default:loop_v2.html.twig' %}
+      {% endfor %}
+  </div>
 {% endfor %}

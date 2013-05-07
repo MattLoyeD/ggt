@@ -48,6 +48,107 @@ class DefaultController extends Controller
     } 
 
 
+    public function getLasts ()
+    {
+    	$rssCached = $em->getRepository('AcmeTabBundle:RSSCache')->findBy(array('link' =>$id_rss),array('last_update' => 'DESC'));
+
+		return array( 'content' => $em->getRepository('AcmeTabBundle:RSSCache')->findBy(array('last_update' => 'DESC')),'from_cache' => true );			
+    }
+
+    public function getRss($id_rss){
+
+		// Preserve useless things
+		if(empty($id_rss))
+			return new Response(json_encode(array("error"=>"Nothing to analyse")));
+
+		$em = $this->getDoctrine()->getEntityManager();
+		
+		if(!$stringurl = $em->getRepository('AcmeTabBundle:Link')->findOneById($id_rss))
+			return new Response(json_encode(array("error"=>"Does not exist")));
+		
+		$rssCached = $em->getRepository('AcmeTabBundle:RSSCache')->findBy(array('link' =>$id_rss),array('last_update' => 'DESC'));
+
+		if(isset($rssCached[0]))
+			if(is_object($rssCached[0]))
+			{
+				if($rssCached[0]->getLastUpdate()->format('Y-m-d H:i:s') > date("Y-m-d H:i:s", strtotime("now + 3 minutes")))
+					return array( 'content' => $em->getRepository('AcmeTabBundle:RSSCache')->findBy(array('link' =>$id_rss),array('last_update' => 'DESC')),'from_cache' => true );			
+			}
+
+		if(!$string = file_get_contents($stringurl->getLink()))
+			return new Response(json_encode(array("error"=>'URL Unreachable')));
+
+
+		// Hack for fucking encoding problems
+		if ('UTF-8' != mb_detect_encoding($string)) {
+		    $string = mb_convert_encoding($string, 'HTML-ENTITIES', "UTF-8");
+		}
+	
+		// Let's go to the mallllll today
+		$array = new NewRssController;
+		$a2 = $array->createArray($string);
+
+		for ($i=0; $i < count($a2['rss']['channel']['item']) ; $i++) { 
+			
+			// Verify before doing anything it exists
+			if(!$link_exist = $em->getRepository('AcmeTabBundle:RSSCache')->findOneByUrl($a2['rss']['channel']['item'][$i]['link'])){
+		
+				$rssCache[$i] = new RSSCache;
+				$rssCache[$i]->setLink($stringurl);
+
+				$content = $a2['rss']['channel']['item'][$i];
+				
+				if(!is_array($content['title'])){
+					$rssCache[$i]->setTitle($content['title']);
+				}else{
+					$rssCache[$i]->setTitle($content['title']['@cdata']);
+				}				
+				
+				if(!is_array($content['description'])){
+					$rssCache[$i]->setContent(substr(strip_tags($content['description']),0,1000));
+				}else{
+					$rssCache[$i]->setContent(substr(strip_tags($content['description']['@cdata']),0,1000));
+				}				
+				
+				if(!is_array($content['link'])){
+					$rssCache[$i]->setUrl($content['link']);
+				}else{
+					$rssCache[$i]->setUrl($content['link']['@cdata']);
+				}				
+				
+				if(!is_array($content['pubDate'])){
+					$date = date_create(date("Y-m-d H:i", strtotime($a2['rss']['channel']['item'][$i]['pubDate'])));
+				}else{
+					$date = date_create(date("Y-m-d H:i", strtotime($a2['rss']['channel']['item'][$i]['pubDate']['@cdata'])));
+				}				
+				$rssCache[$i]->setDate($date);
+				
+				if(isset($a2['rss']['channel']['item'][$i]['enclosure'])){
+					if(!is_array($content['enclosure']['@attributes']['url'])){
+						$rssCache[$i]->setImage($a2['rss']['channel']['item'][$i]['enclosure']['@attributes']['url']);
+					}else{
+						$rssCache[$i]->setImage($a2['rss']['channel']['item'][$i]['enclosure']['@attributes']['url']['@cdata']);
+					}				
+				}
+								
+				// Care w/ images bitch
+				if(isset($a2['rss']['channel']['item'][$i]['enclosure']))
+					$rssCache[$i]->setImage($a2['rss']['channel']['item'][$i]['enclosure']['@attributes']['url']);
+
+				$em->persist($rssCache[$i]);
+		
+			}
+		}
+
+		if(isset($rssCache))
+			$em->flush();
+		
+		$rssCached = $em->getRepository('AcmeTabBundle:RSSCache')->findBy(array('link' =>$id_rss),array('last_update' => 'DESC'));
+
+		return array( 'content' => $rssCached, 'from_cache' => false	);			
+	  }
+
+
 	/**
      * Récupère le nom de domaine raccourci à partir d'une url
      *
@@ -155,69 +256,31 @@ class DefaultController extends Controller
 
 				return new Response($title_xml);
 
+				/*case 'getTest':
+				$module = 'getRss';
+				$link=1;
+				$test = DefaultController::ajaxAction('module=getRss&link=1');
+				var_dump($test);
+				return new Response(print_r($test));*/
+
 				case 'getRss':
-
-				$linksend = $request->query->get('link');
 				
-				// Preserve useless things
-				if(empty($linksend))
-					return new Response(json_encode(array("error"=>"Nothing to analyse")));
+				//echo $request->query->get('link');
+				$render = DefaultController::getRss($request->query->get('link'));
 
-				if(!$stringurl = $em->getRepository('AcmeTabBundle:Link')->findOneById($linksend))
-					return new Response(json_encode(array("error"=>"Does not exist")));
-				
-				$rssCached = $stringurl = $em->getRepository('AcmeTabBundle:RSSCache')->findOneByIdRss($linksend);
-
-				if($rssCache->getLastUpdate() < strtotime("now - 5 minutes"))
-					return new Response(json_encode(array('content' => $rssCache)));
-
-
-				if(!$string = file_get_contents($stringurl->getLink()))
-					return new Response(json_encode(array("error"=>'URL Unreachable')));
-
-
-				// Hack for fucking encoding problems
-				if ('UTF-8' != mb_detect_encoding($string)) {
-				    $string = mb_convert_encoding($string, 'HTML-ENTITIES', "UTF-8");
+				date_default_timezone_set('Europe/Paris');
+				$parsed = array();
+				$hour_ago = array();
+				for ($i=0; $i < 11; $i++) { 
+					$hour_ago[$i] = strtotime('-'.$i.' hour');
 				}
-			
-				// Let's go to the mallllll today
-				$array = new NewRssController;
-				$a2 = $array->createArray($string);
-			
-				/* Tricherie V2
-				echo "<pre>";
-				var_dump($a2);
-				echo "</pre>";
-				*/
-
-
-				for ($i=0; $i < count($a2['rss']['channel']['item']) ; $i++) { 
-				
-					$rssCache[$i] = new RSSCache;
-					
-					$rssCache->setIdRss($linksend);
-
-					$rssCache->setTitle($a2['rss']['channel']['item'][$i]['title']);
-					$rssCache->setContent(substr(htmlentities($a2['rss']['channel']['item'][$i]['description']),0,1000));
-					$rssCache->setUrl($a2['rss']['channel']['item'][$i]['url']);
-					
-					// Care w/ images bitch
-					//$rssCache->setImage($a2['rss']['channel']['item'][$i]['image_src']);
-					
-					$rssCache->setDate($a2['rss']['channel']['item'][$i]['date']);
-			
-				}
-
-				$em->persist($rssCache);
-				$em->flush();
-				
-				// New ones inc. Reloading everything. No pity for databases
-				unset($rssCached);
-				$rssCached = $stringurl = $em->getRepository('AcmeTabBundle:RSSCache')->findOneByIdRss($linksend);
-
-			    return new Response(json_encode(array('content' => $rssCached)));
-
+				//return print_r($render);
+			    return $this->render('AcmeTabBundle:Default:loop_v2.html.twig',
+			    	array(
+			    		'xml' => $render['content'],
+			     		'from_cache' => $render['from_cache'],
+			     		'hour_ago' => $hour_ago
+			     	));
 
 				case 'getAllRss':
 
@@ -233,18 +296,20 @@ class DefaultController extends Controller
 
 				foreach($af as $f){
 					if($f->getLink() != ''){
+						if($rss = $this->getRss($f->getId())){
 
-					if($rss = @file_get_contents($f->getLink())){
-
-					// $rss = tidy_repair_string($rss,array('input-xml' => 1));
-					// $cat = $em->getRepository('AcmeTabBundle:Category')->findOneById($f->getCategory());
-
-					if($parseur = new RssController($rss)){
-					$favicon = 'http://www.google.com/s2/favicons?domain='.$this->get_domain($f->getLink());
-				
-					$parsed[]=array('id' => $f->getId(), 'category' => $f->getCategory(), 'name' => $f->getName(), 'link'=> @$f->getLink(), 'rss' => $parseur->exportItems(),'favicon'=>$favicon);
-				
-					}}}
+						$favicon = 'http://www.google.com/s2/favicons?domain='.$this->get_domain($f->getLink());
+					
+						$parsed[]=array(
+							'id' => $f->getId(),
+							'category' => $f->getCategory(), 
+							'name' => $f->getName(), 
+							'link'=> $f->getLink(), 
+							'rss' => $rss,
+							'favicon'=>$favicon
+							);					
+						}
+					}
 				}
 
 				return $this->render('AcmeTabBundle:Default:loop.html.twig',array(

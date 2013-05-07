@@ -156,12 +156,17 @@ $.merge($.dynaCloud.stopwords, ["I","VII","VI","V","II","III","IV","IX","X","dir
 
     $('.refresher_orb').click(function(){rssReloader();});
 
+    $('.resume').live('click',function(){
+      $('.desc.opened').not($(this)).toggle('fast').removeClass('opened');
+      $(this).find('.desc').toggle('fast').toggleClass('opened');
+    });
+
     $('.link_remover').live("click",function(){
-     
-   $.getJSON(apilink, {
-        module: 'deleteLink',
-        id:  $(this).attr('rel')
-      }, function(data) {
+       
+     $.getJSON(apilink, {
+          module: 'deleteLink',
+          id:  $(this).attr('rel')
+        }, function(data) {
 
         if(data.status !== 'KO'){
         

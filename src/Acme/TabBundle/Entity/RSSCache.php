@@ -23,9 +23,9 @@ class RSSCache
 
     /**
      * 
-     * @ORM\ManyToOne(targetEntity="Acme\TabBundle\Entity\Link", inversedBy="id")
+     * @ORM\ManyToOne(targetEntity="Acme\TabBundle\Entity\Link", inversedBy="link")
      */
-    private $id_rss;
+    private $link;
 
 
     /**
@@ -133,9 +133,9 @@ class RSSCache
      * @param string $id_rss
      * @return RSSCache
      */
-    public function setIdRss($id_rss)
+    public function setLink($link)
     {
-        $this->id_rss = $id_rss;
+        $this->link = $link;
     
         return $this;
     }
@@ -145,9 +145,9 @@ class RSSCache
      *
      * @return string 
      */
-    public function getIdRss()
+    public function getLink()
     {
-        return $this->id_rss;
+        return $this->link;
     }
 
     /**
